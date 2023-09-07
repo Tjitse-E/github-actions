@@ -74,7 +74,6 @@ runs:
 
     - name: Get all changed files
       uses: tj-actions/changed-files@v39
-      shell: bash
       id: changed-files-phpcs
       with:
         write_output_files: true
@@ -89,6 +88,7 @@ runs:
 
     - name: Run step if test file(s) change
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      shell: bash
       run: |
         echo "One or more app file(s) has changed."
         echo "List all the files that have changed: ${{ steps.changed-files-phpcs.outputs.app_all_changed_files }}"
