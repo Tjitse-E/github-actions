@@ -79,7 +79,7 @@ runs:
         write_output_files: true
         output_dir: ${{ github.workspace }}
         separator: " "
-        files_phpcs: |
+        files_yaml: |
           app:
             - '**/*.php'
             - '**/*.phtml'
