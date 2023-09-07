@@ -73,11 +73,24 @@ runs:
       run: vendor/bin/phpcs --config-set installed_paths ${{ github.workspace }}/vendor/magento/magento-coding-standard,${{ github.workspace }}/vendor/phpcompatibility/php-compatibility
 
     - name: Get all changed files
-      uses: tj-actions/changed-files@v37
+      uses: tj-actions/changed-files@v39
+      id: changed-files-phpcs
       with:
         write_output_files: true
         output_dir: ${{ github.workspace }}
         separator: " "
+        files_phpcs: |
+          app:
+            - '**/*.php'
+            - '**/*.phtml'
+            - '**/*.html'
+            - '**/*.xml'
+
+    - name: Run step if test file(s) change
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      run: |
+        echo "One or more app file(s) has changed."
+        echo "List all the files that have changed: ${{ steps.changed-files-phpcs.outputs.app_all_changed_files }}"
 
     - name: Verify the contents of the modified_files.txt file
       shell: bash
