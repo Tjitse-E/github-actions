@@ -74,6 +74,7 @@ runs:
 
     - name: Get all changed files
       uses: tj-actions/changed-files@v39
+      shell: bash
       id: changed-files-phpcs
       with:
         write_output_files: true
