@@ -53,25 +53,6 @@ runs:
       with:
         fetch-depth: 0
 
-    - name: Set PHP Version
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ inputs.php_version }}
-        tools: composer:v${{ inputs.composer_version }}
-        coverage: none
-
-    - name: Install Coding Standard && Codesniffer baseline
-      shell: bash
-      run: |
-        git config --global advice.detachedHead false
-        composer require "magento/magento-coding-standard: ${{ github.event.inputs.version || '*' }}" -W
-        composer config --no-plugins allow-plugins.digitalrevolution/php-codesniffer-baseline true
-        composer require --dev "digitalrevolution/php-codesniffer-baseline: ${{ github.event.inputs.baseline_version || '*' }}"
-
-    - name: Register Coding Standard
-      shell: bash
-      run: vendor/bin/phpcs --config-set installed_paths ${{ github.workspace }}/vendor/magento/magento-coding-standard,${{ github.workspace }}/vendor/phpcompatibility/php-compatibility
-
     - name: Get all changed files
       uses: tj-actions/changed-files@v39
       id: changed-files-phpcs
@@ -85,17 +66,46 @@ runs:
             - '**/*.phtml'
             - '**/*.html'
             - '**/*.xml'
+  
+    - name: Inform if no files have changed
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'false'
+      shell: bash
+      run: |
+        echo "No file(s) that are relevant for PHPCS have changed."
+        echo "List all the files that have changed: ${{ steps.changed-files-phpcs.outputs.app_all_changed_files }}"
 
     - name: Run step if test file(s) change
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
       shell: bash
       run: |
-        echo "One or more app file(s) has changed."
+        echo "One or more file(s) that are relevant for PHPCS have changed."
         echo "List all the files that have changed: ${{ steps.changed-files-phpcs.outputs.app_all_changed_files }}"
 
-    - name: Run phpcs on changed files
-      shell: bash
+    - name: Set PHP Version
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php_version }}
+        tools: composer:v${{ inputs.composer_version }}
+        coverage: none
+
+    - name: Install Coding Standard && Codesniffer baseline
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      shell: bash
+      run: |
+        git config --global advice.detachedHead false
+        composer require "magento/magento-coding-standard: ${{ github.event.inputs.version || '*' }}" -W
+        composer config --no-plugins allow-plugins.digitalrevolution/php-codesniffer-baseline true
+        composer require --dev "digitalrevolution/php-codesniffer-baseline: ${{ github.event.inputs.baseline_version || '*' }}"
+
+    - name: Register Coding Standard
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      shell: bash
+      run: vendor/bin/phpcs --config-set installed_paths ${{ github.workspace }}/vendor/magento/magento-coding-standard,${{ github.workspace }}/vendor/phpcompatibility/php-compatibility
+
+    - name: Run phpcs on changed files
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      shell: bash
       run: |
         php vendor/bin/phpcs --standard=Magento2 \
         $([ -n "${{ inputs.severity }}" ] && echo "--severity=${{ inputs.severity }}") \
