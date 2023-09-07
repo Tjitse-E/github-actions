@@ -1,5 +1,5 @@
 name: "Magento compilation (setup:di:compile)"
-author: "Graycore"
+author: "MageOS"
 description: "A Github Action that runs bin/magento setup:di:compile."
 
 inputs:
@@ -21,7 +21,19 @@ runs:
       with:
         fetch-depth: 0
 
+    - name: Get changed files that could break compilation
+      uses: tj-actions/changed-files@v39
+      id: changed-files-phpcs
+      with:
+        files_yaml: |
+          mageos:
+            - 'composer.lock'
+            - 'composer.json'
+            - '**/*.php'
+            - '**/*.xml'
+
     - name: Set PHP Version
+      if: steps.changed-files-phpcs.outputs.mageos_any_changed
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ inputs.php_version }}
@@ -29,13 +41,16 @@ runs:
         coverage: none
 
     - name: Install composer dependencies
+      if: steps.changed-files-phpcs.outputs.mageos_any_changed
       shell: bash
       run: composer install
 
     - name: Enable all modules
+      if: steps.changed-files-phpcs.outputs.mageos_any_changed
       shell: bash
       run: php bin/magento module:enable --all
 
     - name: Compile
+      if: steps.changed-files-phpcs.outputs.mageos_any_changed
       shell: bash
       run: php bin/magento setup:di:compile
