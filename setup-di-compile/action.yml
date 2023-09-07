@@ -23,17 +23,22 @@ runs:
 
     - name: Get changed files that could break compilation
       uses: tj-actions/changed-files@v39
-      id: changed-files-phpcs
+      id: changed-files
       with:
         files_yaml: |
-          mageos:
+          magento:
             - 'composer.lock'
             - 'composer.json'
             - '**/*.php'
             - '**/*.xml'
 
+    - name: Debug, output changed files
+      shell: bash
+      run: |
+        echo "List all the files that have changed: ${{ steps.changed-files.outputs.magento_all_changed_files }}"
+
     - name: Set PHP Version
-      if: steps.changed-files-phpcs.outputs.mageos_any_changed
+      if: steps.changed-files.outputs.magento_any_changed
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ inputs.php_version }}
@@ -41,16 +46,16 @@ runs:
         coverage: none
 
     - name: Install composer dependencies
-      if: steps.changed-files-phpcs.outputs.mageos_any_changed
+      if: steps.changed-files.outputs.magento_any_changed
       shell: bash
       run: composer install
 
     - name: Enable all modules
-      if: steps.changed-files-phpcs.outputs.mageos_any_changed
+      if: steps.changed-files.outputs.magento_any_changed
       shell: bash
       run: php bin/magento module:enable --all
 
     - name: Compile
-      if: steps.changed-files-phpcs.outputs.mageos_any_changed
+      if: steps.changed-files.outputs.magento_any_changed
       shell: bash
       run: php bin/magento setup:di:compile
