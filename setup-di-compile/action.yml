@@ -21,6 +21,11 @@ runs:
       with:
         fetch-depth: 0
 
+    - name: Debug inputs
+      run: |
+          echo "PHP Version: ${{ inputs.php_version }}"
+          echo "Composer Version: ${{ inputs.composer_version }}"
+
     - name: Get changed files that could break compilation
       uses: tj-actions/changed-files@v39
       id: changed-files
