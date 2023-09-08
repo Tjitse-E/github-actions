@@ -22,6 +22,7 @@ runs:
         fetch-depth: 0
 
     - name: Debug inputs
+      shell: bash
       run: |
           echo "PHP Version: ${{ inputs.php_version }}"
           echo "Composer Version: ${{ inputs.composer_version }}"
