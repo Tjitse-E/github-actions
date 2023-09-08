@@ -13,13 +13,19 @@ inputs:
     default: "2"
     description: "The version of composer to use."
 
+  branch:
+    required: false
+    default: ""
+    description: "The branch to use."
+
 runs:
   using: composite
   steps:
     - name: Checkout Project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: ${{ github.event.inputs.branch }}
 
     - name: Get changed files that could break compilation
       uses: tj-actions/changed-files@v39
