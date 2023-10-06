@@ -101,7 +101,7 @@ runs:
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
       shell: bash
       run: |
-          ls -la ../
+          ls -la vendor
 
     - name: Register coding standards
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
