@@ -104,7 +104,6 @@ runs:
       working-directory: magento-coding-standard
       shell: bash
       run: |
-        # git config --global advice.detachedHead false
         composer config --no-plugins allow-plugins.digitalrevolution/php-codesniffer-baseline true
         composer require --dev "digitalrevolution/php-codesniffer-baseline: ${{ github.event.inputs.baseline_version || '*' }}"
 
