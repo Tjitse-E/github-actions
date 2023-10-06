@@ -91,16 +91,13 @@ runs:
         tools: composer:v${{ inputs.composer_version }}
         coverage: none
 
-#    - name: Create coding standards directory
-#      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
-#      shell: bash
-#      run: mkdir magento-coding-standard
-
     - name: Create composer project
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
       shell: bash
       run: |
-        composer create-project --no-plugins --no-dev magento/magento-coding-standard magento-coding-standard "${{ github.event.inputs.version || '*' }}"
+        composer create-project --no-plugins --no-dev \
+        magento/magento-coding-standard \
+        magento-coding-standard "${{ github.event.inputs.version || '*' }}"
 
     - name: Register coding standards
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
