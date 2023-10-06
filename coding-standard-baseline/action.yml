@@ -97,6 +97,12 @@ runs:
       run: |
         composer create-project --no-plugins --no-dev magento/magento-coding-standard "${{ github.event.inputs.version || '*' }}"
 
+    - name: debug
+      if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
+      shell: bash
+      run: |
+          ls -la
+
     - name: Register coding standards
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
       working-directory: magento-coding-standard
