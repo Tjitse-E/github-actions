@@ -101,7 +101,7 @@ runs:
       working-directory: magento-coding-standard
       shell: bash
       run: |
-        composer create-project --no-plugins --no-dev magento/magento-coding-standard "${{ github.event.inputs.version || '*' }}" .
+        composer create-project --no-plugins --no-dev magento/magento-coding-standard . "${{ github.event.inputs.version || '*' }}"
 
     - name: debug
       if: steps.changed-files-phpcs.outputs.app_any_changed == 'true'
