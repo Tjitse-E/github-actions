@@ -65,6 +65,7 @@ runs:
         repository: ${{ inputs.head_repo }}
 
     - uses: dorny/paths-filter@v2
+      name: Filter changed files
       id: filter
       with:
         list-files: shell
@@ -72,13 +73,7 @@ runs:
           phpcs:
             - added|modified: '**/**.{php,phtml,graphqls,less,css,html,xml,js}'
 
-    - name: Inform if no files have changed
-      if: steps.filter.outputs.phpcs == 'false'
-      shell: bash
-      run: |
-        echo "No files relevant to PHPCS have changed. Skipping PHPCS run."
-
-    - name: Inform if relevant files have changed
+    - name: Check changed files for PHPcs
       if: steps.filter.outputs.phpcs == 'true'
       shell: bash
       run: |
@@ -93,7 +88,7 @@ runs:
         tools: composer:v${{ inputs.composer_version }}
         coverage: none
 
-    - name: Create composer project
+    - name: Install coding standards
       if: steps.filter.outputs.phpcs == 'true'
       shell: bash
       run: |
@@ -101,7 +96,7 @@ runs:
         magento/magento-coding-standard \
         magento-coding-standard "${{ github.event.inputs.version || '*' }}"
 
-    - name: Register coding standards
+    - name: Install phpcs baseline
       if: steps.filter.outputs.phpcs == 'true'
       working-directory: magento-coding-standard
       shell: bash
@@ -109,7 +104,7 @@ runs:
         composer config --no-plugins allow-plugins.digitalrevolution/php-codesniffer-baseline true
         composer require --dev "digitalrevolution/php-codesniffer-baseline: ${{ github.event.inputs.baseline_version || '*' }}"
 
-    - name: Checkout base to generate baseline
+    - name: Checkout base
       if: steps.filter.outputs.phpcs == 'true'
       uses: actions/checkout@v4
       with:
