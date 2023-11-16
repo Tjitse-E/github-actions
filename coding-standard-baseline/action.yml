@@ -45,17 +45,27 @@ inputs:
     default: "*"
     description: "The version of phpcs baseline to use (default: latest)."
 
+  head_repo:
+    type: string
+    required: true
+    description: "The repository full name of the head branch. E.g.: mage-os/mageos-magento2"
+
+  head_ref:
+    type: string
+    required: true
+    description: "The branch name of the head branch. E.g.: main"
+
 runs:
   using: composite
   steps:
     - name: Checkout head
       uses: actions/checkout@v4
       with:
-        ref: ${{github.event.pull_request.head.ref}}
-        repository: ${{github.event.pull_request.head.repo.full_name}}
+        ref: ${{ inputs.head_ref }}
+        repository: ${{ inputs.head_repo }}
 
     - name: Get all changed files
-      uses: tj-actions/changed-files@v40
+      uses: tj-actions/changed-files@v39
       id: changed-files-phpcs
       with:
         files_yaml: |
